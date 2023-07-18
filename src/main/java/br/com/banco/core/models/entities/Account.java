@@ -21,5 +21,5 @@ public class Account {
     @Column(name = "id_conta")
     private Integer id;
     @Column(name = "nome_responsavel")
-    private String nome;
+    private String name;
 }

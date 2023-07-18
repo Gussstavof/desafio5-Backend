@@ -20,11 +20,11 @@ public class Transfer {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     @Column(name = "data_transferencia ")
-    private LocalDateTime dataTransferencia;
-    private BigDecimal valor;
-    private String tipo;
+    private LocalDateTime transferDate;
+    private BigDecimal value;
+    private String type;
     @Column(name = "nome_operador_transacao")
-    private String operador;
+    private String operator;
     @ManyToOne
     private Account account;
 }
