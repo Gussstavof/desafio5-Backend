@@ -27,4 +27,5 @@ public class TransferResponse {
         this.account = new AccountResponse(transfer.getAccount());
         BeanUtils.copyProperties(transfer, this);
     }
+
 }

@@ -1,10 +1,10 @@
-package br.com.banco.core.services;
+package br.com.banco.core.services.transfer;
 
 import br.com.banco.core.models.entities.Account;
 import br.com.banco.core.models.entities.Transfer;
 import br.com.banco.core.models.enuns.TypeTransfer;
 import br.com.banco.core.models.response.TransferResponse;
-import br.com.banco.core.services.transfer.TransferService;
+import br.com.banco.core.repositories.TransferRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,27 +14,23 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class BankServiceTest {
+class TransferGetAllTest {
 
     @InjectMocks
-    private BankService bankService;
+    private TransferGetAll transferGetAll;
     @Mock
-    private List<TransferService> transferServices;
-    @Mock
-    private TransferService transferService;
-    private  Transfer transfer2;
-    private Transfer transfer1;
-    private  Account account;
-    private  List<Transfer> transfers;
+    private TransferRepository repository;
+    private Transfer transfer;
+    private Account account;
+    private List<Transfer> transfers;
     private  List<TransferResponse> transferResponses;
 
     @BeforeEach
@@ -44,7 +40,7 @@ public class BankServiceTest {
                 .name("Gustavo")
                 .build();
 
-        transfer1 = Transfer.builder()
+        transfer = Transfer.builder()
                 .id(1)
                 .transferDate(LocalDateTime.of(2020, 12, 1, 12, 10))
                 .value(BigDecimal.valueOf(2000.00))
@@ -53,35 +49,39 @@ public class BankServiceTest {
                 .type(TypeTransfer.DEPOSITO)
                 .build();
 
-        transfer2 = Transfer.builder()
-                .id(2)
-                .transferDate(LocalDateTime.of(2022, 12, 1, 13, 10))
-                .value(BigDecimal.valueOf(-200.00))
-                .account(account)
-                .operator("Gustavo")
-                .type(TypeTransfer.SAQUE)
-                .build();
-
-        transfers = Arrays.asList(transfer1, transfer2);
+        transfers = Collections.singletonList(transfer);
 
         transferResponses = transfers.stream()
                 .map(TransferResponse::new)
                 .collect(Collectors.toList());
+
     }
-
     @Test
-    void getTransfersByAccount(){
+    void getTransfersByAccount() {
+        when(repository.findAll())
+                .thenReturn(transfers);
 
-        when(transferService.getTransfersByAccount(12, null, null, null))
-                .thenReturn(transferResponses);
-        when(transferServices.stream())
-                .thenReturn(Stream.of(transferService));
-
-        List<TransferResponse> result = bankService
-                .getTransfersByAccount(12, null, null, null);
+        List<TransferResponse> result = transferGetAll.getTransfersByAccount(
+                null,
+                null,
+                null,
+                null);
 
         assertEquals(transferResponses, result);
         assertEquals(transferResponses.get(0).getId(), result.get(0).getId());
         assertInstanceOf(transferResponses.getClass(), result);
     }
+
+    @Test
+    void getTransfersByAccountShouldReturnNull() {
+
+        List<TransferResponse> result = transferGetAll.getTransfersByAccount(
+                null,
+                "Gustavo",
+                null,
+                null);
+
+        assertNull(result);
+    }
+
 }
